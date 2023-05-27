@@ -1,18 +1,33 @@
-import React, {useState} from 'react'
+import React, {useState, onSubmit} from 'react'
 import "./contact.css"
 import axios from 'axios';
 
 const Contact = () => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
 
-  const onSubmit = () => {
-    axios.post(`https://sheet.best/api/sheets/f8b17ece-26f3-4600-b92d-815857edc06a`, {
-      name, email, subject, message
-    })
-  }
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    axios
+      .post('https://sheet.best/api/sheets/f8b17ece-26f3-4600-b92d-815857edc06a', formData) // Change the endpoint to match your backend setup
+      .then((response) => {
+        console.log('Data saved successfully:', response);
+        // Reset the form if needed
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      })
+      .catch((error) => {
+        console.error('Error saving data:', error);
+      });
+  };
 
   return (
     <section className="contact container section" id='contact'>
@@ -22,25 +37,58 @@ const Contact = () => {
         <div className="contact__info">
           <h3 className="contact__title">Let's talk about everything!</h3>
           <p className="contact__details">Don't like forms? Send me an email. 👋</p>
+          <p className='contact__details'><button className='btn' onClick={() => window.location = 'mailto:rajendrasubedi2002@gmail.com'}>info@rajendra2002.com.np</button></p>
         </div>
 
-        <form action="" className="contact__form">
+        <form onSubmit={handleSubmit} className="contact__form">
           <div className="contact__form-group">
             <div className="contact__form-div">
-              <input type="text" className="contact__form-input" onChange={(e)=> setName(e.target.value)} placeholder='Insert your name' />
+
+              <input 
+                type="text"
+                className="contact__form-input"
+                name="name" 
+                value={formData.name}
+                onChange={handleChange}
+                placeholder='Insert your name' />
             </div>
 
             <div className="contact__form-div">
-              <input type="email" className="contact__form-input" onChange={(e)=> setEmail(e.target.value)} placeholder='Insert your email' />
+
+              <input 
+                type="email"
+                name='email'
+                className="contact__form-input" 
+                value={formData.email}
+                onChange={handleChange}
+                placeholder='Insert your email' />
             </div>
+
           </div>
           
             <div className="contact__form-div">
-              <input type="text" className="contact__form-input" onChange={(e)=> setSubject(e.target.value)} placeholder='Insert your subject' />
+
+              <input
+                type="text" 
+                name="subject"
+                value={formData.subject}
+                className="contact__form-input" 
+                onChange={handleChange}
+                placeholder='Insert your subject' />
             </div>
 
             <div className="contact__form-div contact__form-area">
-              <textarea name="" id="" cols="30" rows="10" className='contact__form-input' onChange={(e)=> setMessage(e.target.value)} placeholder='Write your message...'></textarea>
+
+              <textarea
+                name="message" 
+                cols="30" 
+                rows="10" 
+                value={formData.message}
+                className='contact__form-input' 
+                onChange={handleChange}
+                placeholder='Write your message...'>
+                </textarea>
+
             </div>
 
             <button className='btn' type='submit' onClick={onSubmit}>Send Message</button>
